@@ -20,3 +20,15 @@ func (t *Task) Update(title string, completed bool) {
 	t.title = title
 	t.completed = completed
 }
+
+func (t *Task) ID() string {
+	return t.id
+}
+
+func (t *Task) Title() string {
+	return t.title
+}
+
+func (t *Task) Completed() bool {
+	return t.completed
+}
