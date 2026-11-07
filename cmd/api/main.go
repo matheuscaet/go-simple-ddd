@@ -9,6 +9,8 @@ import (
 func main() {
 	// Your code here
 	fmt.Println("Hello, World!")
-	task := domain.NewTask("1", "Learn Go")
+	task := domain.NewTask("Learn Go")
 	fmt.Printf("Task created: %+v\n", task)
+	task.Update("Learn Go and DDD", true)
+	fmt.Printf("Task updated: %+v\n", task)
 }

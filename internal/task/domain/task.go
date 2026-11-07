@@ -1,15 +1,22 @@
 package domain
 
+import "github.com/google/uuid"
+
 type Task struct {
 	id        string
 	title     string
 	completed bool
 }
 
-func NewTask(id string, title string) *Task {
+func NewTask(title string) *Task {
 	return &Task{
-		id:        id,
+		id:        uuid.NewString(),
 		title:     title,
 		completed: false,
 	}
+}
+
+func (t *Task) Update(title string, completed bool) {
+	t.title = title
+	t.completed = completed
 }
