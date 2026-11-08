@@ -3,14 +3,24 @@ package main
 import (
 	"fmt"
 
-	"github.com/matheuscaet/go-simple-ddd/internal/task/domain"
+	"github.com/matheuscaet/go-simple-ddd/internal/task/application"
+	repoTask "github.com/matheuscaet/go-simple-ddd/internal/task/infrastructure/repository"
 )
+
+type TaskHandler struct {
+	service *application.TaskService
+}
 
 func main() {
 	// Your code here
 	fmt.Println("Hello, World!")
-	task := domain.NewTask("Learn Go")
+	handler := &TaskHandler{
+		service: application.NewTaskService(repoTask.NewInMemoryTaskRepository()),
+	}
+	task, err := handler.service.Create(&application.TaskInput{Title: "My first task"})
+	if err != nil {
+		fmt.Printf("Error creating task: %v\n", err)
+		return
+	}
 	fmt.Printf("Task created: %+v\n", task)
-	task.Update("Learn Go and DDD", true)
-	fmt.Printf("Task updated: %+v\n", task)
 }
