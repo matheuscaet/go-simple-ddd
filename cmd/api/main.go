@@ -1,26 +1,30 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/matheuscaet/go-simple-ddd/internal/task/application"
-	repoTask "github.com/matheuscaet/go-simple-ddd/internal/task/infrastructure/repository"
+	taskApp "github.com/matheuscaet/go-simple-ddd/internal/task/application"
+	taskInfra "github.com/matheuscaet/go-simple-ddd/internal/task/infra"
+	taskHttp "github.com/matheuscaet/go-simple-ddd/internal/task/interfaces/http"
 )
 
-type TaskHandler struct {
-	service *application.TaskService
-}
-
 func main() {
-	// Your code here
-	fmt.Println("Hello, World!")
-	handler := &TaskHandler{
-		service: application.NewTaskService(repoTask.NewInMemoryTaskRepository()),
+	address := "localhost:8090"
+
+	taskService := taskApp.NewTaskService(taskInfra.NewMemoryRepository())
+
+	mux := http.NewServeMux()
+	taskHandler := taskHttp.NewHandler(taskService)
+	taskHandler.RegisterRoutes(mux)
+
+	server := &http.Server{
+		Addr:    address,
+		Handler: mux,
 	}
-	task, err := handler.service.Create(&application.TaskInput{Title: "My first task"})
-	if err != nil {
-		fmt.Printf("Error creating task: %v\n", err)
-		return
+
+	log.Printf("Server is running on %s", address)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
-	fmt.Printf("Task created: %+v\n", task)
 }

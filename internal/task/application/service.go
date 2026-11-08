@@ -30,14 +30,14 @@ func NewTaskService(repo domain.TaskRepository) *TaskService {
 
 func (s *TaskService) Create(input *TaskInput) (*TaskOutput, error) {
 	task := domain.NewTask(input.Title)
-	if err := s.repo.Save(nil, task); err != nil {
+	if err := s.repo.Save(task); err != nil {
 		return nil, err
 	}
 	return toOutput(task), nil
 }
 
 func (s *TaskService) List() ([]*TaskOutput, error) {
-	tasks, err := s.repo.List(nil)
+	tasks, err := s.repo.List()
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *TaskService) List() ([]*TaskOutput, error) {
 }
 
 func (s *TaskService) FindByID(id string) (*TaskOutput, error) {
-	task, err := s.repo.FindByID(nil, id)
+	task, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -57,5 +57,5 @@ func (s *TaskService) FindByID(id string) (*TaskOutput, error) {
 }
 
 func (s *TaskService) Delete(id string) error {
-	return s.repo.Delete(nil, id)
+	return s.repo.Delete(id)
 }

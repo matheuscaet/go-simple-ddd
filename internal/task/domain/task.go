@@ -32,3 +32,11 @@ func (t *Task) Title() string {
 func (t *Task) Completed() bool {
 	return t.completed
 }
+
+func ToTask(id string, title string, completed bool) *Task {
+	return &Task{
+		id:        id,
+		title:     title,
+		completed: completed,
+	}
+}

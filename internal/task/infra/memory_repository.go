@@ -1,6 +1,10 @@
 package infra
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/matheuscaet/go-simple-ddd/internal/task/domain"
+)
 
 type record struct {
 	ID        string
@@ -19,31 +23,45 @@ func NewMemoryRepository() *MemoryRepository {
 	}
 }
 
-func (r *MemoryRepository) Save(record *record) {
+func (r *MemoryRepository) Save(task *domain.Task) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.records[record.ID] = record
+	r.records[task.ID()] = &record{
+		ID:        task.ID(),
+		Title:     task.Title(),
+		Completed: task.Completed(),
+	}
+	return nil
 }
 
-func (r *MemoryRepository) List() []*record {
+func (r *MemoryRepository) List() ([]*domain.Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	records := make([]*record, 0, len(r.records))
+	records := make([]*domain.Task, 0, len(r.records))
 	for _, record := range r.records {
-		records = append(records, record)
+		records = append(records, toDomainTask(record))
 	}
-	return records
+	return records, nil
 }
 
-func (r *MemoryRepository) FindByID(id string) (*record, bool) {
+func (r *MemoryRepository) FindByID(id string) (*domain.Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	record, exists := r.records[id]
-	return record, exists
+	if !exists {
+		return nil, domain.ErrTaskNotFound
+	}
+
+	return toDomainTask(record), nil
 }
 
-func (r *MemoryRepository) Delete(id string) {
+func (r *MemoryRepository) Delete(id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	delete(r.records, id)
+	return nil
+}
+
+func toDomainTask(r *record) *domain.Task {
+	return domain.ToTask(r.ID, r.Title, r.Completed)
 }
